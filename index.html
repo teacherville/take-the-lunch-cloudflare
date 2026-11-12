@@ -1,5 +1,5 @@
 <!doctype html><html class="dongle-on"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>급식을 가져가!</title>
+<title>급식을 가져가!</title><meta name="description" content="학교 급식실에서 친구들에게 급식을 배식하는 타이쿤 게임! 우리반 대회로 실시간 순위도 겨뤄요."><link rel="icon" href="favicon.ico" sizes="32x32"><link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="theme-color" content="#ff98bd"><meta property="og:type" content="website"><meta property="og:title" content="급식을 가져가! · 학교 급식 타이쿤"><meta property="og:description" content="친구들에게 급식을 배식하는 타이쿤 게임! 우리반 대회로 실시간 순위도 겨뤄요."><meta property="og:image" content="og-image.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1253,7 +1253,7 @@ button{touch-action:manipulation}
         <div><i>2</i><b>학생</b><span>각자 코드를 넣거나 QR을 찍고<br>이름과 팀을 골라 게임해요</span></div>
         <div><i>3</i><b>실시간 순위</b><span>선생님 화면에 개인·팀 순위가<br>바로바로 올라가요</span></div>
       </div>
-      <p class="ctNote">기록은 선생님 화면에만 있어요. 선생님이 "대회 끝내기"를 누르거나 창을 닫으면 코드와 기록이 모두 사라져요.</p>
+      <p class="ctNote">기록은 선생님 화면에만 있고 서버에는 아무것도 남지 않아요. 선생님이 "대회 끝내기"를 누르거나 창을 닫으면 코드와 기록이 모두 사라져요.</p>
       <div class="bigOpts">
         <button class="bigOpt" id="ctHost"><b>선생님</b><span>대회 열기</span></button>
         <button class="bigOpt mint" id="ctJoin"><b>학생</b><span>대회 참가하기</span></button>
@@ -2483,9 +2483,57 @@ function readRCode(name,str){
  const v=x%33554432,sum=Math.floor(x/33554432);if(sum!==(fnv(normName(name)+'|'+v+'|gupsik')&0x7FFF))return null;
  const sc=v%1024,ni=Math.floor(v/1024)%8,ch=Math.floor(v/8192);if(sc>1000||ni>4)return null;
  return{score:sc/10,n:NIDX[ni],ch,code:c.slice(0,4)+'-'+c.slice(4)}}
-/* ---------- 우리반 대회: 선생님 브라우저가 서버 (PeerJS로 처음 연결만) ---------- */
+/* ---------- 우리반 대회: 선생님 브라우저가 기록을 들고, Cloudflare는 말 전달만 (저장 0) ---------- */
 const PEER_PREFIX='gupsik-v1-';
-const PEER_SRC=['https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js','https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js','https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js'];
+/* ★ 대회 서버 주소 — 클라우드플레어에 올린 뒤 나오는 주소로 바꿔 주세요 (GitHub Pages에서 열 때 이 주소로 연결해요)
+   클라우드플레어 주소로 게임을 열면 이 값과 상관없이 같은 주소로 연결해요. */
+const CF_SERVER='https://gupsik-game.YOUR-ACCOUNT.workers.dev';
+const CF_READY=!/YOUR-ACCOUNT/.test(CF_SERVER);
+const ON_GITHUB=/\.github\.io$/i.test(location.hostname);
+const SERVER=ON_GITHUB?CF_SERVER:'';
+const wsUrl=q=>(SERVER||location.origin).replace(/\/+$/,'').replace(/^http/,'ws')+'/ws?'+new URLSearchParams(q);
+const rid=()=>(Math.random().toString(36).slice(2,12)+Math.random().toString(36).slice(2,10)).replace(/[^a-z0-9]/g,'').padEnd(12,'0');
+const roomOf=id=>String(id||'').replace(PEER_PREFIX,'');
+class Emitter{on(e,f){(this._h=this._h||{})[e]=(this._h[e]||[]).concat(f);return this}emit(e,...a){((this._h||{})[e]||[]).forEach(f=>{try{f(...a)}catch(x){console.error(x)}})}}
+function keepAlive(ws){const t=setInterval(()=>{if(ws.readyState===1){try{ws.send('ping')}catch(e){}}else if(ws.readyState>1)clearInterval(t)},30000);ws.addEventListener('close',()=>clearInterval(t))}
+/* 선생님 쪽에서 본 학생 한 명 */
+class CfHostConn extends Emitter{constructor(p,cid){super();this.p=p;this.peer=cid;this.open=true}
+ send(d){if(this.open)this.p._tx({k:'send',to:this.peer,d})}
+ close(){if(!this.open)return;this.open=false;this.p._tx({k:'close',to:this.peer});if(this.p.conns[this.peer]===this)delete this.p.conns[this.peer];this.emit('close')}}
+/* 학생 쪽에서 본 선생님 화면 */
+class CfStuConn extends Emitter{constructor(p,to){super();this.p=p;this.peer=to;this.open=false;this.dead=false;p.conns[to]=this;
+  let ws;try{ws=new WebSocket(wsUrl({room:roomOf(to),role:'peer',id:p.id}))}catch(e){this.dead=true;setTimeout(()=>p.emit('error',{type:'network'}),0);return}
+  this.ws=ws;keepAlive(ws);
+  ws.onmessage=ev=>{if(ev.data==='pong'||this.dead)return;let m;try{m=JSON.parse(ev.data)}catch(e){return}
+   if(m.k==='open'){this.open=true;this.emit('open')}else if(m.k==='data'){if(m.d&&m.d.t==='end')this.sawEnd=true;this.emit('data',m.d)}};
+  ws.onclose=ev=>{const was=this.open;this.open=false;this.ws=null;if(this.dead)return;this.dead=true;
+   if(!was){p.emit('error',{type:ev.code===4004?'peer-unavailable':ev.code===4029?'room-full':'network'});return}
+   if(ev.code===4010&&!this.sawEnd)this.emit('data',{t:'end'});
+   this.emit('close')}}
+ send(d){if(this.ws&&this.ws.readyState===1)try{this.ws.send(JSON.stringify({k:'send',d}))}catch(e){}}
+ close(){if(this.dead)return;this._kill();this.emit('close')}
+ _kill(){this.dead=true;this.open=false;if(this.ws){try{this.ws.close(1000)}catch(e){}this.ws=null}}}
+/* PeerJS와 같은 모양(on/connect/reconnect/destroy)이라 아래 대회 코드는 그대로 써요 */
+class CfPeer extends Emitter{constructor(id){super();this.conns={};this.destroyed=false;this.fails=0;this.token=rid();this.isHost=!!id;this.id=id||('s'+rid());
+  setTimeout(()=>{if(this.destroyed)return;if(this.isHost)this._open();else this.emit('open',this.id)},0)}
+ _open(){if(this.destroyed||this.ws)return;let ws;try{ws=new WebSocket(wsUrl({room:roomOf(this.id),role:'host',token:this.token}))}catch(e){this.emit('error',{type:'network'});this.emit('disconnected');return}
+  this.ws=ws;let ready=false;keepAlive(ws);
+  ws.onmessage=ev=>{if(ev.data==='pong'||this.ws!==ws)return;let m;try{m=JSON.parse(ev.data)}catch(e){return}
+   if(m.k==='ready'){ready=true;this.fails=0;this.emit('open',this.id)}
+   else if(m.k==='conn'){const old=this.conns[m.cid];if(old){old.open=false;old.emit('close')}const c=new CfHostConn(this,m.cid);this.conns[m.cid]=c;this.emit('connection',c);c.emit('open')}
+   else if(m.k==='data'){const c=this.conns[m.cid];if(c)c.emit('data',m.d)}
+   else if(m.k==='close'){const c=this.conns[m.cid];if(c){c.open=false;delete this.conns[m.cid];c.emit('close')}}};
+  ws.onclose=ev=>{if(this.ws!==ws)return;this.ws=null;const cs=Object.values(this.conns);this.conns={};cs.forEach(c=>{c.open=false;c.emit('close')});
+   if(this.destroyed)return;
+   if(ev.code===4001){this.emit('error',{type:'unavailable-id'});return}
+   if(!ready)this.emit('error',{type:'network'});
+   this.emit('disconnected')}}
+ reconnect(){if(this.destroyed||this.ws||!this.isHost)return;const d=Math.min(30000,1000*Math.pow(2,this.fails));this.fails++;clearTimeout(this._rt);this._rt=setTimeout(()=>this._open(),d)}
+ connect(to){return new CfStuConn(this,to)}
+ _tx(m){if(this.ws&&this.ws.readyState===1)try{this.ws.send(JSON.stringify(m))}catch(e){}}
+ destroy(){if(this.destroyed)return;this.destroyed=true;clearTimeout(this._rt);
+  if(this.ws){const ws=this.ws;this.ws=null;try{ws.send(JSON.stringify({k:'destroy'}))}catch(e){}setTimeout(()=>{try{ws.close(1000)}catch(e){}},50)}
+  Object.values(this.conns).forEach(c=>c._kill&&c._kill());this.conns={}}}
 const QR_SRC=['https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js','https://unpkg.com/qrcode-generator@1.4.4/qrcode.js'];
 function loadJs(list){return new Promise((res,rej)=>{let i=0;const next=()=>{if(i>=list.length)return rej(new Error('load'));const sc=document.createElement('script');sc.src=list[i++];sc.onload=()=>res();sc.onerror=()=>{sc.remove();next()};document.head.appendChild(sc)};next()})}
 const MOCK=/[?&]mock=1/.test(location.search);
@@ -2497,7 +2545,7 @@ class MockPeer{constructor(id){this.id=id||('m'+Math.random().toString(36).slice
  on(e,f){(this.h[e]=this.h[e]||[]).push(f)}emit(e,...a){(this.h[e]||[]).forEach(f=>{try{f(...a)}catch(x){console.error(x)}})}
  connect(to){const cid=Math.random().toString(36).slice(2);const c=new MockConn(this,to,cid);this.conns[cid]=c;this.bc.postMessage({to,from:this.id,k:'conn',cid});return c}
  reconnect(){}destroy(){this.destroyed=true;try{this.bc.close()}catch(e){}}}
-async function getPeer(){if(MOCK)return MockPeer;if(window.Peer)return window.Peer;await loadJs(PEER_SRC);if(!window.Peer)throw new Error('nopeer');return window.Peer}
+async function getPeer(){if(MOCK)return MockPeer;if(ON_GITHUB&&!CF_READY)throw new Error('noserver');if(!SERVER&&location.protocol==='file:')throw new Error('file');if(!window.WebSocket)throw new Error('nows');return CfPeer}
 const cleanName=v=>String(v||'').replace(/[<>&"'`]/g,'').trim().slice(0,8);
 function parseRoom(c){c=String(c||'').replace(/\D/g,'');if(!/^\d{6}$/.test(c))return null;const n=+c[0],t=+c[1];if(![1,2,3,5,7].includes(n)||!(t===0||[2,3,4,5,6,8].includes(t)))return null;return{code:c,n,teams:t}}
 const roomCh=code=>(fnv('room:'+code)&0xFFF)|1;
@@ -2519,7 +2567,7 @@ async function hostOpen(n,teams){
  $('#hrInfo').textContent=`${n}일 · ${teams?teams+'팀 팀전':'개인전'}`;
  HOST.code=`${n}${teams}${String(Math.floor(Math.random()*10000)).padStart(4,'0')}`;$('#hrCode').textContent=HOST.code;drawQr();
  hostRender();show('hostRoom');hostStatus('연결 준비 중…');
- let P;try{P=await getPeer()}catch(e){hostStatus('인터넷 연결이 안 돼요. 학생들은 "연결 없이 하기"로 하고 결과 코드를 알려 주면 돼요.',true);return}
+ let P;try{P=await getPeer()}catch(e){hostStatus(e&&e.message==='noserver'?'대회 서버 주소가 아직 없어요. index.html의 CF_SERVER에 클라우드플레어 주소를 적어 주세요.':e&&e.message==='file'?'파일로 열면 대회 연결이 안 돼요. 인터넷 주소로 열어 주세요.':'인터넷 연결이 안 돼요. 학생들은 "연결 없이 하기"로 하고 결과 코드를 알려 주면 돼요.',true);return}
  hostTry(P,0);
 }
 function hostStatus(t,bad){const e=$('#hrStatus');e.textContent=t;e.classList.toggle('bad',!!bad)}
@@ -2596,20 +2644,24 @@ $('#jGo').onclick=()=>{sfx.click();const r=jRead();if(!r)return;if(STU){try{STU.
  jStat('선생님 화면에 연결하는 중…');$('#jGo').disabled=true;stuConnect(false)};
 $('#jOffline').onclick=()=>{sfx.click();const r=jRead();if(!r)return;STU={code:r.code,n:r.n,teams:r.teams,name:r.name,team:r.team,pid:myPid(),ok:false,started:false,ended:false,offline:true};stuStart()};
 async function stuConnect(silent){const S=STU;if(!S||S.ended)return;
- const fail=t=>{if(STU!==S)return;$('#jGo').disabled=false;if(!S.started){jStat(t+' 선생님 화면과 연결이 안 되면 "연결 없이 하기"로 해도 돼요.',true);$('#jOffline').hidden=false}else setTimeout(()=>stuRetry(S),5000)};
- let P;try{P=await getPeer()}catch(e){fail('인터넷에 연결할 수 없어요.');return}
+ const fail=t=>{if(STU!==S)return;$('#jGo').disabled=false;if(!S.started){jStat(t+' 선생님 화면과 연결이 안 되면 "연결 없이 하기"로 해도 돼요.',true);$('#jOffline').hidden=false}else stuBackoff(S)};
+ let P;try{P=await getPeer()}catch(e){fail(e&&e.message==='noserver'?'대회 서버가 아직 준비되지 않았어요.':'인터넷에 연결할 수 없어요.');return}
  try{S.peer&&S.peer.destroy()}catch(x){}
  const peer=new P(undefined,{debug:0});S.peer=peer;
  const to=setTimeout(()=>{if(!S.ok)fail('선생님 화면을 찾지 못했어요.')},10000);
  peer.on('open',()=>{const c=peer.connect(PEER_PREFIX+S.code,{reliable:true});S.conn=c;
   c.on('open',()=>c.send({t:'hello',pid:S.pid,name:S.name,team:S.team}));
   c.on('data',d=>{try{stuMsg(S,d,to)}catch(x){}});
-  c.on('close',()=>{if(STU!==S)return;S.ok=false;if(!S.ended)setTimeout(()=>stuRetry(S),3000)});c.on('error',()=>{})});
- peer.on('error',e=>{if(S.ok)return;clearTimeout(to);fail(e&&e.type==='peer-unavailable'?'그 코드의 대회를 찾지 못했어요. 코드를 다시 확인해 주세요.':'연결에 문제가 생겼어요.')});
+  c.on('close',()=>{if(STU!==S)return;S.ok=false;if(!S.ended)stuBackoff(S)});c.on('error',()=>{})});
+ peer.on('error',e=>{if(S.ok)return;clearTimeout(to);fail(e&&e.type==='peer-unavailable'?'그 코드의 대회를 찾지 못했어요. 코드를 다시 확인해 주세요.':e&&e.type==='room-full'?'대회 자리가 꽉 찼어요.':'연결에 문제가 생겼어요.')});
 }
 function stuRetry(S){if(STU===S&&!S.ok&&!S.ended&&!S.offline)stuConnect(true)}
+/* 다시 붙기: 3초→6초→12초…최대 1분, 약 10분 동안 안 되면 쉬었다가 하루가 끝날 때 다시 시도 (서버 사용량 아끼기) */
+function stuBackoff(S){if(STU!==S||S.ended||S.offline||S.ok)return;clearTimeout(S.rt);S.tries=(S.tries||0)+1;
+ if(S.tries>12){S.gaveUp=true;const e=$('#myRank');if(e)e.textContent='선생님 화면과 연결이 끊겼어요';return}
+ S.rt=setTimeout(()=>stuRetry(S),Math.min(60000,3000*Math.pow(2,S.tries-1)))}
 function stuMsg(S,m,to){if(!m||typeof m!=='object'||STU!==S)return;
- if(m.t==='welcome'){clearTimeout(to);S.ok=true;S.name=m.name||S.name;$('#jGo').disabled=false;if(!S.started){jStat('연결됐어요! 게임을 시작해요');sfx.great();setTimeout(stuStart,600)}else{toast('선생님 화면에 다시 연결됐어요');netReport(prog&&prog.finished)}}
+ if(m.t==='welcome'){clearTimeout(to);S.ok=true;S.tries=0;S.gaveUp=false;S.name=m.name||S.name;$('#jGo').disabled=false;if(!S.started){jStat('연결됐어요! 게임을 시작해요');sfx.great();setTimeout(stuStart,600)}else{toast('선생님 화면에 다시 연결됐어요');netReport(prog&&prog.finished)}}
  else if(m.t==='deny'){clearTimeout(to);S.ended=true;$('#jGo').disabled=false;jStat(m.why||'참가할 수 없어요',true);try{S.peer.destroy()}catch(x){}}
  else if(m.t==='rank'){S.rank=m;stuRankShow()}
  else if(m.t==='end'){S.ended=true;S.ok=false;toast('선생님이 대회를 끝냈어요. 수고했어요!');try{S.peer.destroy()}catch(x){}const e=$('#myRank');if(e)e.textContent='대회가 끝났어요!'}
@@ -2621,7 +2673,8 @@ function stuStart(){const S=STU;if(!S)return;S.started=true;
  prog=freshProg(S.n,S.name,'room:'+S.code);prog.contest={code:S.code,pid:S.pid,team:S.team,offline:S.offline};setRun(prog.plan);save=clone(prog);store.set('save',save);
  if(!store.get('seenHow',false)){store.set('seenHow',true);howNext='intro';show('howto')}else dayIntro()}
 function stuResume(){const c=prog.contest,r=parseRoom(c.code);if(!r)return;STU={code:c.code,n:r.n,teams:r.teams,name:prog.name,team:c.team,pid:c.pid||myPid(),ok:false,started:true,ended:false,offline:c.offline,peer:null,conn:null,rank:null};if(!c.offline)stuConnect(true)}
-function netReport(done){if(!prog||!prog.contest||!STU||!STU.ok||!STU.conn)return;try{STU.conn.send({t:'score',day:prog.finished?prog.n:prog.day,scores:prog.scores.slice(0,prog.n).map(x=>+x||0),done:!!(done||prog.finished)})}catch(e){}}
+function netReport(done){if(STU&&STU.gaveUp&&!STU.ok&&!STU.ended&&!STU.offline){STU.gaveUp=false;STU.tries=0;stuConnect(true);return}
+ if(!prog||!prog.contest||!STU||!STU.ok||!STU.conn)return;try{STU.conn.send({t:'score',day:prog.finished?prog.n:prog.day,scores:prog.scores.slice(0,prog.n).map(x=>+x||0),done:!!(done||prog.finished)})}catch(e){}}
 {const rm=new URLSearchParams(location.search).get('room');if(rm&&parseRoom(rm))setTimeout(()=>joinOpen(rm),200)}
 })();
 </script>

@@ -1,5 +1,5 @@
 <!doctype html><html class="dongle-on"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="only light"><meta name="format-detection" content="telephone=no"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>급식을 가져가!</title><meta name="description" content="친구들에게 급식을 배식하는 타이쿤 게임!"><link rel="icon" href="favicon.ico" sizes="32x32"><link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="theme-color" content="#ff98bd"><meta property="og:type" content="website"><meta property="og:title" content="급식을 가져가! · 학교 급식 타이쿤"><meta property="og:description" content="친구들에게 급식을 배식하는 타이쿤 게임! 우리반 대회로 실시간 순위도 겨뤄요."><meta property="og:url" content="https://teacherville-take-the-lunch.teacherville.workers.dev/"><meta property="og:image" content="https://teacherville-take-the-lunch.teacherville.workers.dev/og-image.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
+<title>급식을 가져가!</title><meta name="description" content="학교 급식실에서 친구들에게 급식을 배식하는 타이쿤 게임! 우리반 대회로 실시간 순위도 겨뤄요."><link rel="icon" href="favicon.ico" sizes="32x32"><link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="theme-color" content="#ff98bd"><meta property="og:type" content="website"><meta property="og:title" content="급식을 가져가! · 학교 급식 타이쿤"><meta property="og:description" content="친구들에게 급식을 배식하는 타이쿤 게임! 우리반 대회로 실시간 순위도 겨뤄요."><meta property="og:url" content="https://teacherville-take-the-lunch.teacherville.workers.dev/"><meta property="og:image" content="https://teacherville-take-the-lunch.teacherville.workers.dev/og-image.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1079,6 +1079,42 @@ button{touch-action:manipulation}
 .hrList.many small{font-size:12px!important;white-space:nowrap}
 .hrList.many b{min-width:52px!important;font-size:18px}
 .hrList.many .tchip{font-size:11px;padding:0 4px}
+/* 우리반 대회 안내: 숫자·제목·설명 사이, 큰 버튼의 두 줄 사이 간격 넉넉하게 */
+#contest .card{padding-top:30px}
+.ctSteps{gap:14px!important;margin:16px 0 10px!important}
+.ctSteps div{gap:8px!important;padding:14px 12px 16px!important}
+.ctSteps i{margin-bottom:4px}
+.ctSteps b{line-height:1.1!important}
+.ctSteps span{line-height:1.65!important}
+.ctNote{margin:10px 0 4px!important}
+.bigOpt{gap:10px!important;padding:18px 12px 20px!important}
+.bigOpt b{line-height:1!important}
+.bigOpt span{line-height:1.5!important}
+/* 선생님 대회 화면: 바깥 틀과 붙지 않게 여백 */
+.hrCard{width:880px!important;max-width:880px!important;margin-top:34px!important}
+/* 음악·소리 스위치: 두 버튼 폭과 글자 높이 맞추기 (받침 없는 "소리"가 위로 떠 보이지 않게) */
+.tgl{min-width:118px;justify-content:center}
+.tgl .tl{display:inline-block;min-width:2.2em;text-align:center;line-height:1}
+.tgl .tl2{transform:translateY(6px)}
+/* 고르기 버튼·작은 버튼: 글씨 크기는 그대로, 테두리와 글자가 닿지 않게 위아래 여유 */
+.pickRow button,.dayOpt{padding:8px 18px 7px!important;line-height:1.1!important;min-height:46px}
+.card .row .btn:not(.pink){padding-top:10px!important;padding-bottom:5px!important;line-height:1.15}
+.card .row .btn.pink{padding-top:11px!important;padding-bottom:6px!important;line-height:1.15}
+/* 업적 도감: 5칸 × 3줄로 화면 안에 쏙 */
+#achv .card{width:920px!important;max-width:920px!important}
+.achGrid{grid-template-columns:repeat(5,1fr)!important;gap:8px!important;margin-top:6px!important}
+.ach{padding:8px 6px 9px!important}
+.ach .medal{width:40px!important;height:46px!important}
+.ach p{font-size:12.5px!important;line-height:1.45!important}
+/* 이름표 + 입력 칸: 이름표 폭 고정, 입력 칸 폭·높이 통일 → 줄이 세로로 딱 맞게 */
+.suLab{display:grid!important;grid-template-columns:110px 300px 110px;justify-content:center;align-items:center;column-gap:14px;margin:10px auto!important;text-align:right;line-height:1.1}
+.suLab input{width:100%!important;height:50px;box-sizing:border-box;padding:0 12px!important;line-height:normal;text-align:center}
+#jCode{letter-spacing:6px;text-indent:6px}
+#jCode::placeholder{letter-spacing:0}
+.suLab .lt{transform:translateY(4px)}
+.jStatus{min-height:30px!important}
+/* 처음 화면 큰 메뉴 두 개: 같은 크기·같은 기울기 */
+#title .menuBtns #startBtn,#title .menuBtns #contestBtn{--r:-1.5!important;animation:none!important}
 </style>
 <div id="rotate"><div><div class="ph"></div><b>화면을 가로로<br>돌려 주세요</b><p>가로 화면에서<br>더 크게 볼 수 있어요</p><button id="rotGo">그냥 할래요</button></div></div>
 <div id="wrap"><div id="stage">
@@ -1247,12 +1283,12 @@ button{touch-action:manipulation}
     <div class="card" style="width:560px">
       <h2>급식 대작전 준비</h2>
       <p>영양사 선생님이 급식실을 부탁했어요!<br>이름과 배식할 날 수를 골라요.</p>
-      <label class="suLab">이름<input id="suName" maxlength="10" autocomplete="off" placeholder="내 이름"></label>
+      <label class="suLab"><span class="lt">이름</span><input id="suName" maxlength="10" autocomplete="off" placeholder="내 이름"></label>
       <div class="dayOpts"><button class="dayOpt" data-n="1">1일</button><button class="dayOpt" data-n="2">2일</button><button class="dayOpt" data-n="3">3일</button><button class="dayOpt" data-n="5">5일</button><button class="dayOpt" data-n="7">7일</button></div>
       <p class="suNote" id="suNote"></p>
       <div class="modeOpts"><button class="modeOpt on" data-m="c">반 대회</button><button class="modeOpt" data-m="p">개인 연습</button></div>
       <p class="suNote" id="suModeNote"></p>
-      <label class="suLab code" id="suCodeRow">대회 코드<input id="suCode" maxlength="12" autocomplete="off" placeholder="비워도 돼요 (오늘 날짜로 모두 같은 문제)"></label>
+      <label class="suLab code" id="suCodeRow"><span class="lt">대회 코드</span><input id="suCode" maxlength="12" autocomplete="off" placeholder="비워도 돼요 (오늘 날짜로 모두 같은 문제)"></label>
       <div class="row"><button class="btn" id="suBack">처음으로</button><button class="btn pink" id="suGo">시작하기</button></div>
     </div>
   </div>
@@ -1274,7 +1310,7 @@ button{touch-action:manipulation}
         <div><i>2</i><b>학생</b><span>각자 코드를 넣거나 QR을 찍고<br>이름과 팀을 골라 게임해요</span></div>
         <div><i>3</i><b>실시간 순위</b><span>선생님 화면에 개인·팀 순위가<br>바로바로 올라가요</span></div>
       </div>
-      <p class="ctNote">기록은 선생님 화면에만 있고 서버에는 아무것도 남지 않아요. "대회 끝내기"를 누르면 코드와 기록이 모두 사라져요. 실수로 창을 닫거나 새로고침해도 3시간 안에 다시 열면 그대로 이어져요.</p>
+      <p class="ctNote">기록은 선생님 화면에만 있고 서버에는 남지 않아요. 선생님 창을 닫으면 대회가 끝나니, 수업 중에는 창을 닫지 마세요.</p>
       <div class="bigOpts">
         <button class="bigOpt" id="ctHost"><b>선생님</b><span>대회 열기</span></button>
         <button class="bigOpt mint" id="ctJoin"><b>학생</b><span>대회 참가하기</span></button>
@@ -1317,8 +1353,8 @@ button{touch-action:manipulation}
   <div class="screen" id="joinScr" hidden>
     <div class="card" style="width:600px">
       <h2>대회 참가하기</h2>
-      <label class="suLab">참가 코드<input id="jCode" maxlength="6" inputmode="numeric" autocomplete="off" placeholder="숫자 6개"></label>
-      <label class="suLab">내 이름<input id="jName" maxlength="8" autocomplete="off" placeholder="이름"></label>
+      <label class="suLab"><span class="lt">참가 코드</span><input id="jCode" maxlength="6" inputmode="numeric" autocomplete="off" placeholder="숫자 6개"></label>
+      <label class="suLab"><span class="lt">내 이름</span><input id="jName" maxlength="8" autocomplete="off" placeholder="이름"></label>
       <div id="jTeamRow" hidden><p class="hsLab">우리 팀</p><div class="pickRow" id="jTeams"></div></div>
       <p class="jStatus" id="jStatus"></p>
       <div class="row"><button class="btn" id="jBack">뒤로</button><button class="btn butter" id="jOffline" hidden>연결 없이 하기</button><button class="btn pink" id="jGo">참가하기</button></div>
@@ -2865,7 +2901,7 @@ function setSoundIcon(){
  const m=$('#musicBtn'),s=$('#soundBtn');
  m.innerHTML=musicOn?IC_MUSIC:IC_MUSIC.replace('</svg>',IC_OFF+'</svg>');m.classList.toggle('off',!musicOn);m.title=musicOn?'음악 끄기':'음악 켜기';
  s.innerHTML=soundOn?IC_SFX:IC_SFX.replace('</svg>',IC_OFF+'</svg>');s.classList.toggle('off',!soundOn);s.title=soundOn?'소리 끄기':'소리 켜기';
- const pm=$('#pMusic'),ps=$('#pSound');if(pm){pm.innerHTML='음악<i class="sw"></i>';pm.classList.toggle('off',!musicOn)}if(ps){ps.innerHTML='소리<i class="sw"></i>';ps.classList.toggle('off',!soundOn)}}
+ const pm=$('#pMusic'),ps=$('#pSound');if(pm){pm.innerHTML='<span class="tl">음악</span><i class="sw"></i>';pm.classList.toggle('off',!musicOn)}if(ps){ps.innerHTML='<span class="tl tl2">소리</span><i class="sw"></i>';ps.classList.toggle('off',!soundOn)}}
 function toggleMusic(){musicOn=!musicOn;store.set('music',musicOn);setSoundIcon();sfx.click();if(!musicOn)bgmStop();else if(G&&!G.over&&!G.paused)bgmStart(BGM.bpm)}
 function toggleSound(){soundOn=!soundOn;store.set('sound',soundOn);setSoundIcon();sfx.click()}
 $('#musicBtn').onclick=toggleMusic;$('#soundBtn').onclick=toggleSound;$('#pMusic').onclick=toggleMusic;$('#pSound').onclick=toggleSound;setSoundIcon();
@@ -2894,7 +2930,10 @@ const menuOf=d=>prog.week[d];
 const newItems=d=>d===0?[]:menuOf(d).filter(m=>!prog.week.slice(0,d).some(w=>w.includes(m)));
 const slotsEl=$('#custs');
 let slots=[],potState={};
-function show(id){if(id==='howto'&&typeof howPage==='function')howPage(1);document.querySelectorAll('.screen').forEach(s=>s.hidden=s.id!==id)}
+function fitCard(scr){const c=scr&&scr.querySelector(':scope > .card');if(!c)return;const h=c.offsetHeight+40,max=676;const t=h>max?`scale(${(max/h).toFixed(3)})`:'';if(c.style.transform!==t)c.style.transform=t}
+let cardRO=null;try{cardRO=new ResizeObserver(es=>es.forEach(e=>{const s=e.target.closest('.screen');if(s&&!s.hidden)fitCard(s)}))}catch(e){}
+function show(id){if(id==='howto'&&typeof howPage==='function')howPage(1);document.querySelectorAll('.screen').forEach(s=>s.hidden=s.id!==id);
+ const scr=document.getElementById(id);if(scr){const c=scr.querySelector(':scope > .card');if(c&&cardRO&&!c._ro){c._ro=1;cardRO.observe(c)}requestAnimationFrame(()=>fitCard(scr))}}
 function hideAll(){document.querySelectorAll('.screen').forEach(s=>s.hidden=true)}
 
 /* ---------- title ---------- */
@@ -3746,7 +3785,7 @@ $('#calIc').innerHTML=`<svg viewBox="0 0 20 20"><rect x="2" y="4" width="16" hei
 const KID_IC=`<svg viewBox="0 0 20 20"><circle cx="10" cy="8" r="5.5" fill="#ffe7d3" stroke="${L}" stroke-width="2"/><path d="M4.5,7 Q6,2 10,2.4 Q14,2 15.5,7 Q12,5 10,6.5 Q8,5 4.5,7Z" fill="#4b2421" stroke="${L}" stroke-width="1.6" stroke-linejoin="round"/><path d="M3,19 Q3,13.5 10,13.5 Q17,13.5 17,19Z" fill="#ff8fb8" stroke="${L}" stroke-width="2"/></svg>`;
 const CLOCK_IC=`<svg viewBox="0 0 20 20"><circle cx="10" cy="11" r="7.5" fill="#fff" stroke="${L}" stroke-width="2"/><path d="M10,11 V7 M10,11 L13,12.5" stroke="${L}" stroke-width="2" stroke-linecap="round"/><path d="M7,2 h6" stroke="${L}" stroke-width="2" stroke-linecap="round"/></svg>`;
 $('#clockIc').innerHTML=CLOCK_IC;
-[[40,300],[420,60],[430,250],[900,60],[880,320],[250,20]].forEach(([x,y],i)=>$('#title').insertAdjacentHTML('beforeend',`<div class="tsp" style="left:${x}px;top:${y}px;animation-delay:${i*.3}s"><svg viewBox="0 0 24 24"><path d="M12,1 L14.5,9.5 L23,12 L14.5,14.5 L12,23 L9.5,14.5 L1,12 L9.5,9.5Z" fill="${['#ffd041','#ff98bd','#fff'][i%3]}" stroke="${L}" stroke-width="1.5"/></svg></div>`));
+[[40,300],[420,60],[430,250],[900,60],[880,320],[250,20],[612,148,20],[18,150,24],[150,520,26],[228,560,18],[420,600,24],[600,560,20],[640,450,28],[700,25,18],[600,690,22]].forEach(([x,y,z],i)=>$('#title').insertAdjacentHTML('beforeend',`<div class="tsp" style="left:${x}px;top:${y}px;${z?`width:${z}px;height:${z}px;`:''}animation-delay:${(i*.37)%1.6}s"><svg viewBox="0 0 24 24"><path d="M12,1 L14.5,9.5 L23,12 L14.5,14.5 L12,23 L9.5,14.5 L1,12 L9.5,9.5Z" fill="${['#ffd041','#ff98bd','#fff'][i%3]}" stroke="${L}" stroke-width="1.5"/></svg></div>`));
 
 /* idle scene behind title */
 buildKitchen();

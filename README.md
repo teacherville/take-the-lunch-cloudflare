@@ -8,7 +8,7 @@
    (`.assetsignore`, `.gitignore`, `src` 폴더 포함. 점으로 시작하는 파일이 안 보이면 폴더를 통째로 끌어다 놓아요.)
 2. **클라우드플레어에서 가져오기** — 대시보드 → Workers & Pages → Create → **Import a repository**
    → GitHub 연결 → 방금 만든 저장소 선택 → 설정은 그대로 두고 **Deploy**.
-3. 끝나면 `https://take-the-lunch.내계정.workers.dev` 주소가 나와요. **이 주소가 게임 주소예요.**
+3. 끝나면 `https://teacherville-take-the-lunch.teacherville1.workers.dev` 주소가 나와요. **이 주소가 게임 주소예요.**
    학생들에게 이 주소를 알려 주거나, 대회 화면의 QR을 찍게 하면 돼요.
 
 ## 고칠 때
@@ -18,18 +18,26 @@ GitHub에서 파일을 고치고 저장(Commit)하면 클라우드플레어가 1
 | 파일 | 역할 |
 |---|---|
 | `index.html` | 게임 전체 |
+| `qr.js` | 대회 QR 코드 만들기 (학교 방화벽이 외부 사이트를 막아도 QR이 나오게 게임 서버에서 직접 제공) |
 | `src/worker.js` | 우리반 대회 중계 서버 (저장 기능 없음) |
 | `wrangler.jsonc` | 클라우드플레어 설정 |
 | `favicon.*`, `apple-touch-icon.png`, `icon-512.png` | 탭·홈 화면 아이콘 |
 | `og-image.jpg` | 링크 보낼 때 나오는 썸네일 |
+
+## 연결이 끊겼을 때
+- 선생님 와이파이가 잠깐 끊겨도 학생들은 몇 초 안에 저절로 다시 붙어요.
+- 선생님이 실수로 새로고침하거나 창을 닫아도, 3시간 안에 다시 열면 같은 코드와 순위 그대로 이어져요.
+- 학생이 새로고침하면 참가 화면에서 "참가하기"만 다시 누르면 하던 날부터 이어져요.
+- 학생이 다른 휴대폰·브라우저로 바꿔도 같은 이름으로 들어오면 선생님 화면의 기록을 이어 받아요.
+- 휴대폰 화면이 꺼졌다 켜지면 바로 다시 연결돼요.
 
 ## 저장공간·사용량
 - 서버에 기록을 저장하지 않아요. 점수·이름·순위는 선생님 브라우저에만 있어요.
 - "대회 끝내기"를 누르면 모든 연결을 끊고 그 대회 방 저장소를 `deleteAll()`로 비워요. 창을 닫아도 방이 비워져요.
 - 조용할 때는 서버가 잠들어서 사용 시간이 거의 안 들어요.
 - 다른 사이트에서는 이 대회 서버에 연결할 수 없어요.
-- 확인: 대시보드 → `take-the-lunch` → Durable Objects 저장 용량이 0이면 정상이에요.
+- 확인: 대시보드 → `teacherville-take-the-lunch` → Durable Objects 저장 용량이 0이면 정상이에요.
 
 ## 썸네일이 안 나오면 (선택)
 카톡 등에서 썸네일이 안 보이면 `index.html`에서 `og-image.jpg`를
-`https://take-the-lunch.내계정.workers.dev/og-image.jpg` 처럼 전체 주소로 바꿔 주세요.
+`https://teacherville-take-the-lunch.teacherville1.workers.dev/og-image.jpg` 처럼 전체 주소로 바꿔 주세요.

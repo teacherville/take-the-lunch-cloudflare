@@ -1,6 +1,6 @@
 {
-  // 이 이름이 주소가 돼요: https://take-the-lunch.<내계정>.workers.dev
-  "name": "take-the-lunch",
+  // 이 이름이 주소가 돼요: https://teacherville-take-the-lunch.teacherville1.workers.dev
+  "name": "teacherville-take-the-lunch",
   "main": "src/worker.js",
   "compatibility_date": "2025-06-01",
 

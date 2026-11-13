@@ -17,6 +17,7 @@ const MAX_MSG = 4096;           // 메시지 최대 크기(바이트) — 장난
 // 닫힘 코드 (게임 화면 코드와 맞춰야 함)
 const C_TAKEN = 4001;     // 같은 코드의 대회가 이미 열려 있음
 const C_HOSTGONE = 4002;  // 선생님 화면 연결이 끊김
+const C_REPLACED = 4003;  // 같은 대회를 다른 창에서 다시 열어서 이 창은 쉬어요
 const C_NOROOM = 4004;    // 그 코드의 대회가 없음
 const C_ENDED = 4010;     // 선생님이 대회를 끝냄
 const C_FULL = 4029;      // 인원 초과
@@ -64,6 +65,8 @@ function refuse(code, reason) {
   const pair = new WebSocketPair();
   const [client, server] = Object.values(pair);
   server.accept();
+  // 닫힘 코드는 중간 장비(학교 방화벽 등)에서 지워질 수 있어서, 이유를 메시지로 먼저 보내요
+  try { server.send(JSON.stringify({ k: "bye", code })); } catch (e) {}
   server.close(code, reason);
   return new Response(null, { status: 101, webSocket: client });
 }
@@ -75,6 +78,7 @@ const live = (ws) => ws.readyState === 1 && !att(ws).gone;
 const sendJ = (ws, m) => { try { ws.send(JSON.stringify(m)); } catch (e) {} };
 const shut = (ws, code, reason) => {
   try { ws.serializeAttachment({ ...att(ws), gone: true }); } catch (e) {}
+  if (code !== 1000) sendJ(ws, { k: "bye", code });
   try { ws.close(code, reason); } catch (e) {}
 };
 
@@ -100,7 +104,7 @@ export class Room extends DurableObject {
       if (old) {
         // 같은 선생님 화면이 다시 붙는 경우(와이파이 끊김 등)만 교체 허용
         if (att(old).token !== token) return refuse(C_TAKEN, "taken");
-        shut(old, 1000, "replaced");
+        shut(old, C_REPLACED, "replaced"); // 같은 선생님이 다른 창(또는 새로고침)에서 다시 연 경우
       }
       const pair = new WebSocketPair();
       const [client, server] = Object.values(pair);

@@ -1,0 +1,30 @@
+{
+  // 이 이름이 주소가 돼요: https://teacherville-take-the-lunch.teacherville.workers.dev
+  "name": "teacherville-take-the-lunch",
+  "main": "src/worker.js",
+  "compatibility_date": "2025-06-01",
+
+  // workers.dev 주소를 항상 켜 둬요 (꺼지면 게임 주소가 사라져요)
+  "workers_dev": true,
+
+  // 저장소 맨 위의 index.html·이미지를 그대로 게임 화면으로 제공 (정적 파일은 무료·무제한)
+  // 올리지 않을 파일은 .assetsignore 에 적혀 있어요
+  "assets": {
+    "directory": "./",
+    "binding": "ASSETS"
+  },
+
+  "vars": {
+    // 지금은 클라우드플레어 주소에서 연 게임만 대회 서버를 쓸 수 있어요 (다른 사이트 차단)
+    // 나중에 GitHub Pages에서도 열고 싶으면 "https://내아이디.github.io" 를 적어 주세요
+    "ALLOWED_ORIGINS": ""
+  },
+
+  // 대회 방 하나 = Durable Object 하나 (아무것도 저장하지 않음)
+  "durable_objects": {
+    "bindings": [{ "name": "ROOMS", "class_name": "Room" }]
+  },
+
+  // 무료 플랜은 SQLite 방식 Durable Object만 쓸 수 있어요
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room"] }]
+}

@@ -1112,7 +1112,35 @@ button{touch-action:manipulation}
 #jCode{letter-spacing:6px;text-indent:6px}
 #jCode::placeholder{letter-spacing:0}
 .suLab .lt{transform:translateY(4px)}
-.jStatus{min-height:30px!important}
+#joinScr .card{padding-bottom:30px!important}
+#joinScr .card>h2{margin-bottom:30px!important}
+#joinScr .row{margin-top:24px!important}
+#joinScr .jStatus:empty{display:none}
+#joinScr .suLab+.suLab{margin-top:14px!important}
+.jStatus{min-height:24px!important;margin:4px 0!important}
+/* 대회 열기: "이름표 | 고르기 버튼" 한 줄씩, 줄마다 연한 칸으로 묶기 */
+.hsRows{display:flex;flex-direction:column;gap:10px;margin:4px 0 6px}
+.hsRow{display:grid;grid-template-columns:122px 1fr;align-items:center;column-gap:16px;background:#fff;border:2.5px solid #f2d6e3;border-radius:18px;padding:12px 18px;text-align:left}
+.hsRow[hidden]{display:none!important}
+.hsK{font-family:var(--display);font-size:24px;color:var(--ink);transform:translateY(3px);white-space:nowrap}
+.hsRow .pickRow{justify-content:flex-start;gap:8px;margin:0!important}
+.hsRow .pickRow button{min-width:66px}
+.hsV{display:flex;flex-direction:column;gap:8px}
+.hsRow .hsSub{text-align:left;margin:0!important}
+/* 준비 화면 코스 설명 두 줄: 주아체로 또렷하게 */
+.suNote{font-family:"Jua",sans-serif!important;font-size:17px!important;line-height:1.6!important;opacity:.85}
+/* 준비 화면: 안내는 오른쪽 아래 영양사 선생님 말풍선으로, 코스 설명은 날짜 버튼과 아래 버튼 사이 가운데 */
+#setup .card>h2{margin-bottom:26px!important}
+#setup .dayOpts{margin-bottom:0!important}
+#setup #suNote{margin:20px 0 0!important}
+#setup .row{margin-top:20px!important}
+.suChef{position:absolute;right:2px;bottom:0;display:flex;align-items:flex-end;gap:6px;pointer-events:none;z-index:3}
+.suBub{position:relative;background:#fff;border:3px solid var(--ink);border-radius:20px;padding:10px 16px;font-family:"Jua",sans-serif;font-size:18px;line-height:1.5;color:var(--ink);text-align:center;box-shadow:0 3px 0 #5e233f33;margin-bottom:46px;white-space:nowrap}
+.suBub::after{content:"";position:absolute;right:-12px;top:50%;width:16px;height:16px;margin-top:-8px;background:#fff;border-right:3px solid var(--ink);border-top:3px solid var(--ink);transform:rotate(45deg)}
+.suChefImg{width:200px}
+.suChefImg svg{width:100%;height:auto;display:block}
+/* 일반 게임 고르기: 제목만 있는 큰 버튼, 글자 정가운데 */
+#modeSel .bigOpt{justify-content:center;min-height:120px;padding:16px 12px 12px!important}
 /* 처음 화면 큰 메뉴 두 개: 같은 크기·같은 기울기 */
 #title .menuBtns #startBtn,#title .menuBtns #contestBtn{--r:-1.5!important;animation:none!important}
 </style>
@@ -1282,7 +1310,7 @@ button{touch-action:manipulation}
   <div class="screen" id="setup" hidden>
     <div class="card" style="width:560px">
       <h2>급식 대작전 준비</h2>
-      <p>영양사 선생님이 급식실을 부탁했어요!<br>이름과 배식할 날 수를 골라요.</p>
+      
       <label class="suLab"><span class="lt">이름</span><input id="suName" maxlength="10" autocomplete="off" placeholder="내 이름"></label>
       <div class="dayOpts"><button class="dayOpt" data-n="1">1일</button><button class="dayOpt" data-n="2">2일</button><button class="dayOpt" data-n="3">3일</button><button class="dayOpt" data-n="5">5일</button><button class="dayOpt" data-n="7">7일</button></div>
       <p class="suNote" id="suNote"></p>
@@ -1291,13 +1319,14 @@ button{touch-action:manipulation}
       <label class="suLab code" id="suCodeRow"><span class="lt">대회 코드</span><input id="suCode" maxlength="12" autocomplete="off" placeholder="비워도 돼요 (오늘 날짜로 모두 같은 문제)"></label>
       <div class="row"><button class="btn" id="suBack">처음으로</button><button class="btn pink" id="suGo">시작하기</button></div>
     </div>
+    <div class="suChef" aria-hidden="true"><div class="suBub">영양사 선생님이<br>급식실을 부탁했어요!<br>이름과 날 수를 골라요</div><div class="suChefImg" id="suChefImg"></div></div>
   </div>
   <div class="screen" id="modeSel" hidden>
     <div class="card" style="width:620px">
       <h2>일반 게임</h2>
       <div class="bigOpts">
-        <button class="bigOpt" id="storyBtn"><b>스토리 모드</b><span>며칠 동안 급식실을 맡아<br>상장을 받아요</span></button>
-        <button class="bigOpt mint" id="endlessBtn"><b>무한 모드</b><span>하트가 다 떨어질 때까지<br>얼마나 버틸까요?</span></button>
+        <button class="bigOpt" id="storyBtn"><b>스토리 모드</b></button>
+        <button class="bigOpt mint" id="endlessBtn"><b>무한 모드</b></button>
       </div>
       <div class="row"><button class="btn" id="modeBack">처음으로</button></div>
     </div>
@@ -1310,7 +1339,7 @@ button{touch-action:manipulation}
         <div><i>2</i><b>학생</b><span>각자 코드를 넣거나 QR을 찍고<br>이름과 팀을 골라 게임해요</span></div>
         <div><i>3</i><b>실시간 순위</b><span>선생님 화면에 개인·팀 순위가<br>바로바로 올라가요</span></div>
       </div>
-      <p class="ctNote">기록은 선생님 화면에만 있고 서버에는 남지 않아요. 선생님 창을 닫으면 대회가 끝나니, 수업 중에는 창을 닫지 마세요.</p>
+      <p class="ctNote">선생님 화면을 닫으면 참가 코드와 랭킹이 저장되지 않고 초기화되니, 수업 중에는 창을 닫지 마세요!</p>
       <div class="bigOpts">
         <button class="bigOpt" id="ctHost"><b>선생님</b><span>대회 열기</span></button>
         <button class="bigOpt mint" id="ctJoin"><b>학생</b><span>대회 참가하기</span></button>
@@ -1319,14 +1348,13 @@ button{touch-action:manipulation}
     </div>
   </div>
   <div class="screen" id="hostSet" hidden>
-    <div class="card" style="width:620px">
+    <div class="card hsCard" style="width:720px">
       <h2>대회 열기</h2>
-      <p class="hsLab">대회 방식</p>
-      <div class="pickRow" id="hsMode"><button data-v="0">개인전</button><button data-v="1">팀전</button></div>
-      <div id="hsTeamRow"><p class="hsLab">팀 수</p><div class="pickRow" id="hsTeams"><button data-v="2">2팀</button><button data-v="3">3팀</button><button data-v="4">4팀</button><button data-v="5">5팀</button><button data-v="6">6팀</button><button data-v="8">8팀</button></div>
-      <p class="hsSub">팀 점수는 팀원 점수의 평균이에요. 팀 인원이 달라도 공평해요.</p></div>
-      <p class="hsLab">날 수</p>
-      <div class="pickRow" id="hsDays"><button data-v="1">1일</button><button data-v="2">2일</button><button data-v="3">3일</button><button data-v="5">5일</button><button data-v="7">7일</button></div>
+      <div class="hsRows">
+        <div class="hsRow"><span class="hsK">대회 방식</span><div class="pickRow" id="hsMode"><button data-v="0">개인전</button><button data-v="1">팀전</button></div></div>
+        <div class="hsRow" id="hsTeamRow"><span class="hsK">팀 수</span><div class="hsV"><div class="pickRow" id="hsTeams"><button data-v="2">2팀</button><button data-v="3">3팀</button><button data-v="4">4팀</button><button data-v="5">5팀</button><button data-v="6">6팀</button><button data-v="8">8팀</button></div></div></div>
+        <div class="hsRow"><span class="hsK">날 수</span><div class="pickRow" id="hsDays"><button data-v="1">1일</button><button data-v="2">2일</button><button data-v="3">3일</button><button data-v="5">5일</button><button data-v="7">7일</button></div></div>
+      </div>
       <div class="row"><button class="btn" id="hsBack">뒤로</button><button class="btn pink" id="hsGo">대회 열기</button></div>
     </div>
   </div>
@@ -2938,6 +2966,7 @@ function hideAll(){document.querySelectorAll('.screen').forEach(s=>s.hidden=true
 
 /* ---------- title ---------- */
 $('#chef').innerHTML=chefSVG('happy');
+try{$('#suChefImg').innerHTML=chefSVG('happy')}catch(e){}
 let patN=0;
 const SVG_PRE='<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">';
 const innerOf=id=>ART[id].slice(SVG_PRE.length,-6);
@@ -3785,7 +3814,7 @@ $('#calIc').innerHTML=`<svg viewBox="0 0 20 20"><rect x="2" y="4" width="16" hei
 const KID_IC=`<svg viewBox="0 0 20 20"><circle cx="10" cy="8" r="5.5" fill="#ffe7d3" stroke="${L}" stroke-width="2"/><path d="M4.5,7 Q6,2 10,2.4 Q14,2 15.5,7 Q12,5 10,6.5 Q8,5 4.5,7Z" fill="#4b2421" stroke="${L}" stroke-width="1.6" stroke-linejoin="round"/><path d="M3,19 Q3,13.5 10,13.5 Q17,13.5 17,19Z" fill="#ff8fb8" stroke="${L}" stroke-width="2"/></svg>`;
 const CLOCK_IC=`<svg viewBox="0 0 20 20"><circle cx="10" cy="11" r="7.5" fill="#fff" stroke="${L}" stroke-width="2"/><path d="M10,11 V7 M10,11 L13,12.5" stroke="${L}" stroke-width="2" stroke-linecap="round"/><path d="M7,2 h6" stroke="${L}" stroke-width="2" stroke-linecap="round"/></svg>`;
 $('#clockIc').innerHTML=CLOCK_IC;
-[[40,300],[420,60],[430,250],[900,60],[880,320],[250,20],[612,148,20],[18,150,24],[150,520,26],[228,560,18],[420,600,24],[600,560,20],[640,450,28],[700,25,18],[600,690,22]].forEach(([x,y,z],i)=>$('#title').insertAdjacentHTML('beforeend',`<div class="tsp" style="left:${x}px;top:${y}px;${z?`width:${z}px;height:${z}px;`:''}animation-delay:${(i*.37)%1.6}s"><svg viewBox="0 0 24 24"><path d="M12,1 L14.5,9.5 L23,12 L14.5,14.5 L12,23 L9.5,14.5 L1,12 L9.5,9.5Z" fill="${['#ffd041','#ff98bd','#fff'][i%3]}" stroke="${L}" stroke-width="1.5"/></svg></div>`));
+[[40,300],[420,60],[430,250],[900,60],[880,320],[250,20],[640,450,24],[150,520,20]].forEach(([x,y,z],i)=>$('#title').insertAdjacentHTML('beforeend',`<div class="tsp" style="left:${x}px;top:${y}px;${z?`width:${z}px;height:${z}px;`:''}animation-delay:${(i*.37)%1.6}s"><svg viewBox="0 0 24 24"><path d="M12,1 L14.5,9.5 L23,12 L14.5,14.5 L12,23 L9.5,14.5 L1,12 L9.5,9.5Z" fill="${['#ffd041','#ff98bd','#fff'][i%3]}" stroke="${L}" stroke-width="1.5"/></svg></div>`));
 
 /* idle scene behind title */
 buildKitchen();
